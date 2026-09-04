@@ -1,0 +1,19 @@
+# Example: note that the upstream recompiler also emits a stub finder
+# (ExportSFunctions / scoped) and the ps2xStudio GUI. The two CLI tools in
+# this repo are the core recompile path and are all that's needed.
+
+# Minimal beserk.toml — fill with the ELF you extracted and re-run.
+[general]
+input = "game.elf"
+output_folder = "src/game"
+
+# Function map from Ghidra (optional, improves boundaries):
+# ghidra_output = "functions.csv"
+
+# Keep the runtime symbols (kernel entry points) as stubs so the game links:
+[general.stubs]
+# ps2_analyzer generates a stubs: section from the embedded SCE symbol DB.
+# It is written into game.toml — review and commit that file.
+
+# Generate one combined cpp instead of many (easier to diff while learning):
+# combined = true
