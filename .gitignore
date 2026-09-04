@@ -1,0 +1,30 @@
+build/
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+*.dll
+*.so
+
+# Game data (user must provide)
+game files/
+*.iso
+*.cue
+*.bin
+*.elf
+
+# Generated
+*.json
+*.c
+*.h
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
