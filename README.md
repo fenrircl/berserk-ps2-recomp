@@ -1,9 +1,9 @@
-# Berserk: Millennium Falcon — Recompilation
+# Berserk: Millennium Falcon Hen — Recompilation
 
-Static ahead-of-time recompilation of **Berserk: Millennium Falcon Hen
-~Wasurebana no Shō~** (PlayStation 2, 2004) for modern Windows PCs.
+Static ahead-of-time recompilation of **Berserk: Millennium Falcon Hen — Seima Senki no Shō**
+(PlayStation 2, 2004) for modern Windows PCs.
 
-> **Status: Planning / Early Research**
+> **Status: Early research.** Runbook: [`docs/START-HERE.md`](docs/START-HERE.md)
 
 ## What this project is
 
@@ -21,11 +21,11 @@ ahead-of-time into C, compiled natively — no emulator or BIOS required.
 
 | Field | Value |
 |-------|-------|
-| Title | Berserk: Millennium Falcon Hen ~Wasurebana no Shō~ |
-| JP Title | バーサーク ミレニアムファルコン編 ~ワスレバナノ章~ |
+| Title | Berserk: Millennium Falcon Hen — Seima Senki no Shō |
+| JP Title | ベルセルク 千年帝国の鷹篇 聖魔戦記の章 |
 | Platform | PlayStation 2 |
 | Developer | Yuke's |
-| Publisher | Capcom |
+| Publisher | Sammy |
 | Release | 2004 (JP only) |
 | Genre | 3D Action / Hack and Slash |
 | Disc | DVD-ROM (standard PS2) |
@@ -43,51 +43,48 @@ ahead-of-time into C, compiled natively — no emulator or BIOS required.
 ## Recompilation Pipeline
 
 ```
-PS2 Disc (ISO/CUE)
+PS2 disc (ISO)
     │
-    ├─ ps2disc_extract.py        Extract ELF from disc
-    │
-    ▼
-game.elf (MIPS R5900 executable)
-    │
-    ├─ mips_disasm.py            Find functions (prologue detection + call graph)
+    ├─ 7z x + SYSTEM.CNF       identify serial (hypothesis SLPM_656.88) and boot ELF
     │
     ▼
-function_map.json
+game ELF (MIPS R5900)
     │
-    ├─ static_recompile.py       Translate MIPS R5900 → C (instruction-by-instruction)
-    │
-    ▼
-game_code_*.c + game_functions.h + dispatch_table.c
-    │
-    ├─ generate_stubs.py         Fill in undefined references
+    ├─ ps2_analyzer            ELF + SCE symbol DB → game.toml (stubs, skip, patches)
     │
     ▼
-Compile with CMake → Native executable
+game.toml
+    │
+    ├─ ps2_recomp              R5900 decode (+MMI/VU0) → C++
+    │
+    ▼
+generated C++ + PS2Recomp runtime (GS, VU1, IOP, SPU2, CDVD, DMA, pads, memcard)
+    │
+    ├─ CMake build (-msse4.1)
+    │
+    ▼
+Native executable
 ```
+
+Details and the bring-up order are in [`docs/START-HERE.md`](docs/START-HERE.md).
 
 ## Tools / Frameworks
 
 | Tool | Purpose | License |
 |------|---------|---------|
-| [RecompilationStudio](https://github.com/Cybertwip/RecompilationStudio) | PS1 MIPS → C recompiler (R3000A) | Other |
-| [PCSX2](https://github.com/PCSX2/pcsx2) | Reference PS2 emulator | GPLv2 |
-| [DobieStation](https://github.com/PS offine/DobieStation) | Reference PS2 emulator (research) | GPLv2 |
-| [N64Recomp](https://github.com/N64Recomp/N64Recomp) | MIPS recomp framework (VR4300, adaptable) | MIT |
+| [PS2Recomp](https://github.com/ran-j/PS2Recomp) | PS2 ELF (R5900) → C++ recompiler + runtime | GPL-3.0 |
+| [ps2-web-recomp](https://github.com/snuri00/ps2-web-recomp) | Reference runtime: GS raster, VU, IOP, CDVD, DMAC | MIT |
+| [PCSX2](https://github.com/PCSX2/pcsx2) | Reference PS2 emulator (hardware behaviour) | GPL-2.0 |
 
-> Note: PS2 uses MIPS R5900 (Emotion Engine), different from PS1 R3000A
-> and N64 VR4300. A dedicated PS2 MIPS recompiler may need to be built
-> or adapted from existing MIPS recomp frameworks.
+> The PS2 has no multi-port framework equivalent to Dreamcast's `dreamcomp`. Each port writes its
+> own hardware bring-up; see `docs/START-HERE.md` for what to borrow and from where.
 
 ## Building
 
-Requirements: CMake 3.16+, C11 compiler, SDL2, Vulkan or OpenGL.
-
-```bash
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
-```
+The port builds against a `PS2Recomp` checkout (recompiler + runtime). This repository holds the
+game config, extracted-symbol work and docs; the executable is produced by CMake with SSE4.1 or
+better. Start with [`docs/START-HERE.md`](docs/START-HERE.md) — it also covers re-syncing the
+vendored runtime, which is a September 2026 snapshot.
 
 ## Project Structure
 
