@@ -13,6 +13,15 @@ If the goal is "Berserk on PC with a launcher, JP audio and ES subtitles", the D
 
 ---
 
+## Toolchain y disco
+
+Misma base Windows que el proyecto de Dreamcast: VS 2022 Build Tools (workload C++ + LLVM/Clang),
+CMake, Ninja, Python 3.12 y 7-Zip. Instalación y verificador automático paso a paso:
+<https://github.com/fenrircl/berserk-dc-recomp/blob/main/docs/SETUP-WINDOWS.md>
+
+Presupuesto: ISO 3.6–4.7 GB, build Release 5–20 GB, repo < 50 MB. **Reserva 50 GB libres.** No
+compilar en el contenedor de Hermes (3.7 GB de RAM, 5.5 GB libres): hacerlo en el PC.
+
 ## 0. Identify the disc (before anything)
 
 Verify on the disc, do not trust the notes:
